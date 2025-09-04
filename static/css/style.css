@@ -1,0 +1,295 @@
+/* Marine Biodiversity Platform Custom Styles */
+/* Following Replit dark theme guidelines - minimal custom overrides */
+
+:root {
+    --ocean-blue: #0077be;
+    --deep-blue: #003f5c;
+    --marine-green: #2d5a27;
+    --coral-orange: #ff6b35;
+    --wave-cyan: #40e0d0;
+}
+
+/* Custom components that extend Bootstrap */
+.border-dashed {
+    border-style: dashed !important;
+    transition: border-color 0.3s ease;
+}
+
+.border-dashed:hover {
+    border-color: var(--bs-primary) !important;
+}
+
+/* Map containers */
+.map-container {
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Alert popup styling for Leaflet maps */
+.alert-popup {
+    min-width: 200px;
+}
+
+.alert-popup h6 {
+    margin-bottom: 0.5rem;
+    color: var(--bs-dark);
+}
+
+.alert-popup p {
+    color: var(--bs-gray-700);
+    font-size: 0.875rem;
+}
+
+/* Chart containers */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+}
+
+/* Species card hover effects */
+.species-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.species-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Conservation status badges */
+.conservation-critical {
+    background-color: var(--bs-danger) !important;
+}
+
+.conservation-endangered {
+    background-color: var(--bs-warning) !important;
+}
+
+.conservation-vulnerable {
+    background-color: var(--bs-info) !important;
+}
+
+.conservation-stable {
+    background-color: var(--bs-success) !important;
+}
+
+/* Loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 0.125rem solid var(--bs-gray-300);
+    border-top-color: var(--bs-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Image upload area */
+.image-upload-area {
+    transition: all 0.3s ease;
+    background-color: var(--bs-gray-100);
+    border: 2px dashed var(--bs-gray-400);
+}
+
+.image-upload-area:hover {
+    border-color: var(--bs-primary);
+    background-color: var(--bs-primary-bg-subtle);
+}
+
+.image-upload-area.dragover {
+    border-color: var(--bs-success);
+    background-color: var(--bs-success-bg-subtle);
+}
+
+/* Ocean health indicators */
+.health-excellent {
+    color: var(--bs-success) !important;
+}
+
+.health-good {
+    color: var(--bs-info) !important;
+}
+
+.health-fair {
+    color: var(--bs-warning) !important;
+}
+
+.health-poor {
+    color: var(--bs-danger) !important;
+}
+
+.health-critical {
+    color: var(--bs-dark) !important;
+}
+
+/* Sustainability score indicators */
+.sustainability-high {
+    background: linear-gradient(45deg, var(--bs-success), var(--marine-green));
+}
+
+.sustainability-medium {
+    background: linear-gradient(45deg, var(--bs-warning), var(--coral-orange));
+}
+
+.sustainability-low {
+    background: linear-gradient(45deg, var(--bs-danger), var(--bs-dark));
+}
+
+/* Data visualization enhancements */
+.metric-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.metric-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Alert severity indicators */
+.alert-critical {
+    border-left: 4px solid var(--bs-danger);
+}
+
+.alert-high {
+    border-left: 4px solid var(--bs-warning);
+}
+
+.alert-medium {
+    border-left: 4px solid var(--bs-info);
+}
+
+.alert-low {
+    border-left: 4px solid var(--bs-secondary);
+}
+
+/* Species identification results */
+.identification-result {
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.confidence-bar {
+    height: 0.5rem;
+    background-color: var(--bs-gray-200);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--bs-danger), var(--bs-warning), var(--bs-success));
+    transition: width 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        border-radius: var(--bs-border-radius) !important;
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn,
+    .btn-group,
+    .navbar,
+    footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Accessibility improvements */
+.sr-only-focusable:focus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 0.5rem 1rem;
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+    text-decoration: none;
+}
+
+/* Focus indicators for better accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Custom scrollbar for webkit browsers */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--bs-gray-100);
+    border-radius: 0.25rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--bs-gray-400);
+    border-radius: 0.25rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-gray-500);
+}
+
+/* Animation for data updates */
+.data-update {
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Ocean current arrows for maps */
+.current-arrow {
+    stroke: var(--wave-cyan);
+    stroke-width: 2;
+    fill: var(--wave-cyan);
+    opacity: 0.8;
+}
+
+/* Temperature gradient overlay */
+.temperature-overlay {
+    background: linear-gradient(
+        45deg,
+        rgba(0, 119, 190, 0.8) 0%,
+        rgba(64, 224, 208, 0.8) 50%,
+        rgba(255, 107, 53, 0.8) 100%
+    );
+}

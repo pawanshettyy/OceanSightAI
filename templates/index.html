@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Marine Biodiversity Platform - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center py-5 bg-primary rounded">
+                <h1 class="display-4 text-white mb-3">
+                    <i class="fas fa-fish me-3"></i>
+                    Marine Biodiversity Platform
+                </h1>
+                <p class="lead text-white mb-4">
+                    AI-powered ocean monitoring, species conservation, and sustainable fisheries management
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-chart-line me-2"></i>View Dashboard
+                    </a>
+                    <a href="{{ url_for('species') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-microscope me-2"></i>Identify Species
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Overview -->
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="card bg-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-database fa-3x mb-3"></i>
+                    <h3>{{ total_species }}</h3>
+                    <p class="card-text">Total Species Monitored</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success">
+                <div class="card-body text-center">
+                    <i class="fas fa-eye fa-3x mb-3"></i>
+                    <h3>{{ recent_observations }}</h3>
+                    <p class="card-text">Recent Observations (30 days)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h3>{{ recent_alerts|length }}</h3>
+                    <p class="card-text">Active Alerts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary">
+                <div class="card-body text-center">
+                    <i class="fas fa-shield-alt fa-3x mb-3"></i>
+                    <h3>24/7</h3>
+                    <p class="card-text">Ocean Monitoring</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Features -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Platform Features</h2>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-thermometer-half fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Oceanographic Monitoring</h5>
+                    <p class="card-text">
+                        Real-time monitoring of ocean temperature, salinity, pH levels, and current patterns 
+                        to track climate change impacts on marine ecosystems.
+                    </p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-area me-2"></i>View Data
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-search fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">AI Species Identification</h5>
+                    <p class="card-text">
+                        Advanced machine learning algorithms for automated identification of marine species 
+                        from images and videos, supporting conservation efforts.
+                    </p>
+                    <a href="{{ url_for('species') }}" class="btn btn-outline-success">
+                        <i class="fas fa-microscope me-2"></i>Identify Species
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-ship fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">Fisheries Management</h5>
+                    <p class="card-text">
+                        Monitor fishing activities, track catch data, and analyze sustainability metrics 
+                        to prevent overfishing and support marine conservation.
+                    </p>
+                    <a href="{{ url_for('fisheries') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-chart-line me-2"></i>View Fisheries
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    {% if recent_alerts %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3">
+                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                Recent Alerts
+            </h3>
+            
+            <div class="list-group">
+                {% for alert in recent_alerts %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">
+                            {% if alert.severity == 'critical' %}
+                                <span class="badge bg-danger me-2">Critical</span>
+                            {% elif alert.severity == 'high' %}
+                                <span class="badge bg-warning me-2">High</span>
+                            {% elif alert.severity == 'medium' %}
+                                <span class="badge bg-info me-2">Medium</span>
+                            {% else %}
+                                <span class="badge bg-secondary me-2">Low</span>
+                            {% endif %}
+                            {{ alert.title }}
+                        </h6>
+                        <small class="text-muted">{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                    <p class="mb-1">{{ alert.description }}</p>
+                    {% if alert.location %}
+                    <small class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ alert.location }}
+                    </small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{{ url_for('alerts') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>View All Alerts
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Technology Stack -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Technology & Data Sources</h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-brain me-2"></i>AI & Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Machine Learning Species Recognition</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Predictive Population Modeling</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Climate Impact Analysis</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Sustainability Scoring</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-satellite me-2"></i>Data Sources</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>NOAA Oceanographic Data</li>
+                                <li><i class="fas fa-check text-success me-2"></i>FAO Fisheries Statistics</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Global Fishing Watch</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Marine Protected Areas Database</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

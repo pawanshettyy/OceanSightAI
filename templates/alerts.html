@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+
+{% block title %}Environmental Alerts - Marine Biodiversity Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-2">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Environmental Alerts
+                    </h1>
+                    <p class="lead">Real-time monitoring alerts for marine biodiversity and fisheries</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary active" id="filter-all">
+                        <i class="fas fa-list me-1"></i>All Alerts
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" id="filter-critical">
+                        <i class="fas fa-exclamation-circle me-1"></i>Critical
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" id="filter-active">
+                        <i class="fas fa-bell me-1"></i>Active Only
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-danger">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                    <h4 id="critical-count">0</h4>
+                    <p class="card-text">Critical Alerts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h4 id="high-count">0</h4>
+                    <p class="card-text">High Priority</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                    <h4 id="medium-count">0</h4>
+                    <p class="card-text">Medium Priority</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4 id="resolved-count">0</h4>
+                    <p class="card-text">Resolved Today</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Types Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>
+                        Filter by Alert Type
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group flex-wrap" role="group">
+                        <input type="checkbox" class="btn-check" id="type-overfishing" checked>
+                        <label class="btn btn-outline-primary" for="type-overfishing">
+                            <i class="fas fa-fish me-1"></i>Overfishing
+                        </label>
+
+                        <input type="checkbox" class="btn-check" id="type-temperature" checked>
+                        <label class="btn btn-outline-primary" for="type-temperature">
+                            <i class="fas fa-thermometer-full me-1"></i>Temperature Anomaly
+                        </label>
+
+                        <input type="checkbox" class="btn-check" id="type-biodiversity" checked>
+                        <label class="btn btn-outline-primary" for="type-biodiversity">
+                            <i class="fas fa-leaf me-1"></i>Biodiversity Risk
+                        </label>
+
+                        <input type="checkbox" class="btn-check" id="type-species" checked>
+                        <label class="btn btn-outline-primary" for="type-species">
+                            <i class="fas fa-bug me-1"></i>Species Threat
+                        </label>
+
+                        <input type="checkbox" class="btn-check" id="type-sustainability" checked>
+                        <label class="btn btn-outline-primary" for="type-sustainability">
+                            <i class="fas fa-recycle me-1"></i>Sustainability Risk
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Map -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marked-alt me-2"></i>
+                        Alert Locations Map
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="alerts-map" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Alerts List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Active Alerts
+                    </h5>
+                    <div class="input-group" style="width: 300px;">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="alert-search" placeholder="Search alerts...">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="alerts-container">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                            <p class="mt-2 text-muted">Loading alerts...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert History -->
+    {% if alerts %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Alert History
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Severity</th>
+                                    <th>Title</th>
+                                    <th>Location</th>
+                                    <th>Created</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alert in alerts %}
+                                <tr class="alert-row" data-type="{{ alert.alert_type }}" data-severity="{{ alert.severity }}">
+                                    <td>
+                                        {% if alert.alert_type == 'overfishing' %}
+                                            <i class="fas fa-fish text-primary me-1"></i>Overfishing
+                                        {% elif alert.alert_type == 'temperature_anomaly' %}
+                                            <i class="fas fa-thermometer-full text-danger me-1"></i>Temperature
+                                        {% elif alert.alert_type == 'biodiversity_risk' %}
+                                            <i class="fas fa-leaf text-success me-1"></i>Biodiversity
+                                        {% elif alert.alert_type == 'species_threat' %}
+                                            <i class="fas fa-bug text-warning me-1"></i>Species
+                                        {% else %}
+                                            <i class="fas fa-exclamation-circle text-info me-1"></i>{{ alert.alert_type|title }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if alert.severity == 'critical' %}
+                                            <span class="badge bg-danger">Critical</span>
+                                        {% elif alert.severity == 'high' %}
+                                            <span class="badge bg-warning">High</span>
+                                        {% elif alert.severity == 'medium' %}
+                                            <span class="badge bg-info">Medium</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ alert.title }}</td>
+                                    <td>
+                                        {% if alert.location %}
+                                            <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                            {{ alert.location }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        {% if alert.is_active %}
+                                            <span class="badge bg-danger">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Resolved</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary btn-sm" 
+                                                    onclick="viewAlertDetails({{ alert.id }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            {% if alert.is_active %}
+                                            <button class="btn btn-outline-success btn-sm" 
+                                                    onclick="resolveAlert({{ alert.id }})">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Alert Details Modal -->
+<div class="modal fade" id="alertDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="alertDetailsBody">
+                <!-- Alert details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="resolveAlertBtn">
+                    <i class="fas fa-check me-1"></i>Mark as Resolved
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize alerts page
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeAlertsPage();
+    });
+
+    function initializeAlertsPage() {
+        loadAlerts();
+        initializeAlertsMap();
+        setupEventListeners();
+        updateAlertCounts();
+    }
+
+    function loadAlerts() {
+        fetch('/api/alerts')
+            .then(response => response.json())
+            .then(alerts => {
+                displayAlerts(alerts);
+                updateAlertsMap(alerts);
+                updateAlertCounts(alerts);
+            })
+            .catch(error => {
+                console.error('Error loading alerts:', error);
+                showError('Failed to load alerts data');
+            });
+    }
+
+    function displayAlerts(alerts) {
+        const container = document.getElementById('alerts-container');
+        
+        if (alerts.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5>No Active Alerts</h5>
+                    <p class="text-muted">All systems are operating normally</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = alerts.map(alert => `
+            <div class="alert alert-${getSeverityClass(alert.severity)} mb-3" data-alert-id="${alert.id}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="alert-heading mb-1">
+                            ${getAlertIcon(alert.type)} ${alert.title}
+                        </h6>
+                        <p class="mb-2">${alert.description}</p>
+                        <div class="d-flex align-items-center gap-3">
+                            ${alert.location ? `<small><i class="fas fa-map-marker-alt me-1"></i>${alert.location}</small>` : ''}
+                            <small><i class="fas fa-clock me-1"></i>${formatDate(alert.created_at)}</small>
+                            <span class="badge bg-${getSeverityClass(alert.severity)}">${alert.severity.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div class="btn-group-vertical btn-group-sm ms-3">
+                        <button class="btn btn-outline-primary btn-sm" onclick="viewAlertDetails(${alert.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" onclick="resolveAlert(${alert.id})">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateAlertCounts(alerts) {
+        if (!alerts) return;
+        
+        const counts = {
+            critical: alerts.filter(a => a.severity === 'critical').length,
+            high: alerts.filter(a => a.severity === 'high').length,
+            medium: alerts.filter(a => a.severity === 'medium').length,
+            resolved: 0 // Would need to be calculated from resolved alerts today
+        };
+
+        document.getElementById('critical-count').textContent = counts.critical;
+        document.getElementById('high-count').textContent = counts.high;
+        document.getElementById('medium-count').textContent = counts.medium;
+        document.getElementById('resolved-count').textContent = counts.resolved;
+    }
+
+    function initializeAlertsMap() {
+        const map = L.map('alerts-map').setView([20, 0], 2);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        window.alertsMap = map;
+    }
+
+    function updateAlertsMap(alerts) {
+        const map = window.alertsMap;
+        
+        // Clear existing markers
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                map.removeLayer(layer);
+            }
+        });
+
+        // Add markers for alerts with locations
+        alerts.filter(alert => alert.latitude && alert.longitude).forEach(alert => {
+            const marker = L.circleMarker([alert.latitude, alert.longitude], {
+                radius: getSeverityRadius(alert.severity),
+                fillColor: getSeverityColor(alert.severity),
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <div class="alert-popup">
+                    <h6>${alert.title}</h6>
+                    <p class="mb-1">${alert.description}</p>
+                    <small class="text-muted">
+                        <span class="badge bg-${getSeverityClass(alert.severity)}">${alert.severity}</span>
+                        ${alert.location}
+                    </small>
+                </div>
+            `);
+        });
+    }
+
+    function setupEventListeners() {
+        // Filter buttons
+        document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[id^="filter-"]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                applyFilters();
+            });
+        });
+
+        // Type filters
+        document.querySelectorAll('[id^="type-"]').forEach(checkbox => {
+            checkbox.addEventListener('change', applyFilters);
+        });
+
+        // Search
+        document.getElementById('alert-search').addEventListener('input', applyFilters);
+    }
+
+    function applyFilters() {
+        const searchTerm = document.getElementById('alert-search').value.toLowerCase();
+        const activeFilter = document.querySelector('[id^="filter-"].active').id.replace('filter-', '');
+        
+        const typeFilters = Array.from(document.querySelectorAll('[id^="type-"]:checked'))
+            .map(cb => cb.id.replace('type-', ''));
+
+        document.querySelectorAll('.alert-row').forEach(row => {
+            const type = row.dataset.type;
+            const severity = row.dataset.severity;
+            const text = row.textContent.toLowerCase();
+            
+            let show = true;
+            
+            // Apply search filter
+            if (searchTerm && !text.includes(searchTerm)) {
+                show = false;
+            }
+            
+            // Apply severity filter
+            if (activeFilter === 'critical' && severity !== 'critical') {
+                show = false;
+            }
+            
+            // Apply type filter
+            if (!typeFilters.includes(type)) {
+                show = false;
+            }
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function viewAlertDetails(alertId) {
+        // This would fetch detailed alert information
+        const modal = new bootstrap.Modal(document.getElementById('alertDetailsModal'));
+        document.getElementById('alertDetailsBody').innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin"></i>
+                Loading alert details...
+            </div>
+        `;
+        modal.show();
+        
+        // Mock alert details - in real implementation, fetch from API
+        setTimeout(() => {
+            document.getElementById('alertDetailsBody').innerHTML = `
+                <div class="alert alert-info">
+                    <h6>Alert ID: ${alertId}</h6>
+                    <p>Detailed information about this alert would be displayed here, including:</p>
+                    <ul>
+                        <li>Full description and context</li>
+                        <li>Related data measurements</li>
+                        <li>Recommended actions</li>
+                        <li>Historical context</li>
+                    </ul>
+                </div>
+            `;
+        }, 500);
+    }
+
+    function resolveAlert(alertId) {
+        if (confirm('Are you sure you want to mark this alert as resolved?')) {
+            // In real implementation, this would make an API call
+            console.log('Resolving alert:', alertId);
+            
+            // Remove alert from display
+            const alertElement = document.querySelector(`[data-alert-id="${alertId}"]`);
+            if (alertElement) {
+                alertElement.style.transition = 'opacity 0.3s';
+                alertElement.style.opacity = '0';
+                setTimeout(() => alertElement.remove(), 300);
+            }
+            
+            // Show success message
+            showSuccess('Alert has been marked as resolved');
+        }
+    }
+
+    function getSeverityClass(severity) {
+        switch(severity) {
+            case 'critical': return 'danger';
+            case 'high': return 'warning';
+            case 'medium': return 'info';
+            case 'low': return 'secondary';
+            default: return 'secondary';
+        }
+    }
+
+    function getSeverityColor(severity) {
+        switch(severity) {
+            case 'critical': return '#dc3545';
+            case 'high': return '#ffc107';
+            case 'medium': return '#0dcaf0';
+            case 'low': return '#6c757d';
+            default: return '#6c757d';
+        }
+    }
+
+    function getSeverityRadius(severity) {
+        switch(severity) {
+            case 'critical': return 15;
+            case 'high': return 12;
+            case 'medium': return 9;
+            case 'low': return 6;
+            default: return 6;
+        }
+    }
+
+    function getAlertIcon(type) {
+        switch(type) {
+            case 'overfishing': return '<i class="fas fa-fish text-primary"></i>';
+            case 'temperature_anomaly': return '<i class="fas fa-thermometer-full text-danger"></i>';
+            case 'biodiversity_risk': return '<i class="fas fa-leaf text-success"></i>';
+            case 'species_threat': return '<i class="fas fa-bug text-warning"></i>';
+            default: return '<i class="fas fa-exclamation-circle text-info"></i>';
+        }
+    }
+
+    function formatDate(dateString) {
+        return new Date(dateString).toLocaleString();
+    }
+
+    function showError(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show';
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+    }
+
+    function showSuccess(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show';
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+    }
+</script>
+{% endblock %}

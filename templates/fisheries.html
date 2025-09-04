@@ -1,0 +1,655 @@
+{% extends "base.html" %}
+
+{% block title %}Fisheries Management - Marine Biodiversity Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-2">
+                        <i class="fas fa-ship text-primary me-2"></i>
+                        Fisheries Management Dashboard
+                    </h1>
+                    <p class="lead">Sustainable fishing monitoring and catch data analysis</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" id="btn-7days">7 Days</button>
+                    <button type="button" class="btn btn-outline-primary active" id="btn-30days">30 Days</button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-90days">90 Days</button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-1year">1 Year</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary">
+                <div class="card-body text-center">
+                    <i class="fas fa-fish fa-2x mb-2"></i>
+                    <h4 id="total-catch">-- tons</h4>
+                    <p class="card-text">Total Catch</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success">
+                <div class="card-body text-center">
+                    <i class="fas fa-leaf fa-2x mb-2"></i>
+                    <h4 id="sustainability-avg">--%</h4>
+                    <p class="card-text">Avg Sustainability</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h4 id="overfishing-alerts">--</h4>
+                    <p class="card-text">Overfishing Alerts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-ship fa-2x mb-2"></i>
+                    <h4 id="active-vessels">--</h4>
+                    <p class="card-text">Active Vessels</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Catch Trends Chart -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Catch Trends Over Time
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="catch-trends-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Species Breakdown -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pie-chart me-2"></i>
+                        Species Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="species-breakdown-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maps and Analysis Row -->
+    <div class="row mb-4">
+        <!-- Fishing Activity Map -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map me-2"></i>
+                        Global Fishing Activity
+                    </h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="map-view" id="catch-view" checked>
+                        <label class="btn btn-outline-secondary" for="catch-view">Catch Data</label>
+                        
+                        <input type="radio" class="btn-check" name="map-view" id="vessel-view">
+                        <label class="btn btn-outline-secondary" for="vessel-view">Vessel Tracking</label>
+                        
+                        <input type="radio" class="btn-check" name="map-view" id="protected-view">
+                        <label class="btn btn-outline-secondary" for="protected-view">Protected Areas</label>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="fishing-map" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sustainability Scores -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-thermometer-half me-2"></i>
+                        Sustainability Scores
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="sustainability-scores-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fishing Pressure Analysis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Fishing Pressure Analysis by Region
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="fishing-pressure-table" class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fishing Area</th>
+                                    <th>Fishing Events</th>
+                                    <th>Total Catch (tons)</th>
+                                    <th>Species Diversity</th>
+                                    <th>Avg Sustainability</th>
+                                    <th>Pressure Level</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pressure-analysis-body">
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading pressure analysis...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts and Recommendations -->
+    <div class="row mb-4">
+        <!-- Overfishing Alerts -->
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-header bg-warning">
+                    <h6 class="mb-0 text-dark">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Overfishing Alerts
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="overfishing-alerts-container" style="max-height: 300px; overflow-y: auto;">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading alerts...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Recommendations -->
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Management Recommendations
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="recommendations-container">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Implement seasonal fishing restrictions in high-pressure areas
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Increase monitoring of threatened species catch quotas
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Promote selective fishing gear to reduce bycatch
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Establish marine protected areas in biodiversity hotspots
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quota Management -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        Quota vs. Actual Catch Analysis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="quota-analysis-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize fisheries dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeFisheriesDashboard();
+    });
+
+    function initializeFisheriesDashboard() {
+        // Load initial data
+        loadFisheriesData('30days');
+        initializeFishingMap();
+        
+        // Set up time period buttons
+        document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('[id^="btn-"]').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get time period from button id
+                const period = this.id.replace('btn-', '');
+                loadFisheriesData(period);
+            });
+        });
+        
+        // Set up map view toggles
+        document.querySelectorAll('input[name="map-view"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateMapView(this.id.replace('-view', ''));
+            });
+        });
+    }
+
+    function loadFisheriesData(period) {
+        // Calculate date range based on period
+        const endDate = new Date();
+        const startDate = new Date();
+        
+        switch(period) {
+            case '7days':
+                startDate.setDate(endDate.getDate() - 7);
+                break;
+            case '30days':
+                startDate.setDate(endDate.getDate() - 30);
+                break;
+            case '90days':
+                startDate.setDate(endDate.getDate() - 90);
+                break;
+            case '1year':
+                startDate.setFullYear(endDate.getFullYear() - 1);
+                break;
+        }
+        
+        // Fetch fisheries data
+        fetch(`/api/fisheries-data?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`)
+            .then(response => response.json())
+            .then(data => {
+                updateFisheriesMetrics(data);
+                updateCatchTrendsChart(data.catch_trends);
+                updateSpeciesBreakdownChart(data.species_breakdown);
+                updateSustainabilityChart(data.sustainability_scores);
+                updateFishingMap(data.geographic_distribution);
+                loadFishingPressureAnalysis();
+            })
+            .catch(error => {
+                console.error('Error loading fisheries data:', error);
+                showError('Failed to load fisheries data');
+            });
+            
+        // Load alerts
+        loadOverfishingAlerts();
+    }
+
+    function updateFisheriesMetrics(data) {
+        // Calculate total catch
+        const totalCatch = data.catch_trends.reduce((sum, item) => sum + item.amount, 0);
+        document.getElementById('total-catch').textContent = `${totalCatch.toFixed(1)} tons`;
+        
+        // Calculate average sustainability
+        if (data.sustainability_scores.length > 0) {
+            const avgSustainability = data.sustainability_scores.reduce((sum, item) => sum + item.score, 0) / data.sustainability_scores.length;
+            document.getElementById('sustainability-avg').textContent = `${avgSustainability.toFixed(1)}%`;
+        }
+        
+        // Count unique species
+        const uniqueSpecies = [...new Set(data.catch_trends.map(item => item.species))];
+        document.getElementById('active-vessels').textContent = uniqueSpecies.length;
+    }
+
+    function updateCatchTrendsChart(trendsData) {
+        const ctx = document.getElementById('catch-trends-chart').getContext('2d');
+        
+        // Group data by date
+        const groupedData = trendsData.reduce((acc, item) => {
+            const date = new Date(item.date).toDateString();
+            if (!acc[date]) acc[date] = 0;
+            acc[date] += item.amount;
+            return acc;
+        }, {});
+        
+        const labels = Object.keys(groupedData).sort();
+        const data = labels.map(date => groupedData[date]);
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Catch (tons)',
+                    data: data,
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Catch Amount (tons)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateSpeciesBreakdownChart(speciesData) {
+        const ctx = document.getElementById('species-breakdown-chart').getContext('2d');
+        
+        const species = Object.keys(speciesData);
+        const catches = species.map(s => speciesData[s].total_catch);
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: species,
+                datasets: [{
+                    data: catches,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)',
+                        'rgb(255, 159, 64)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function updateSustainabilityChart(sustainabilityData) {
+        const ctx = document.getElementById('sustainability-scores-chart').getContext('2d');
+        
+        // Group by score ranges
+        const ranges = {
+            'Critical (0-25)': 0,
+            'Poor (26-50)': 0,
+            'Fair (51-75)': 0,
+            'Good (76-100)': 0
+        };
+        
+        sustainabilityData.forEach(item => {
+            if (item.score <= 25) ranges['Critical (0-25)']++;
+            else if (item.score <= 50) ranges['Poor (26-50)']++;
+            else if (item.score <= 75) ranges['Fair (51-75)']++;
+            else ranges['Good (76-100)']++;
+        });
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(ranges),
+                datasets: [{
+                    label: 'Number of Areas',
+                    data: Object.values(ranges),
+                    backgroundColor: [
+                        'rgb(220, 53, 69)',
+                        'rgb(255, 193, 7)',
+                        'rgb(13, 202, 240)',
+                        'rgb(25, 135, 84)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function initializeFishingMap() {
+        const map = L.map('fishing-map').setView([20, 0], 2);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Store map reference for updates
+        window.fishingMap = map;
+    }
+
+    function updateFishingMap(locationData) {
+        const map = window.fishingMap;
+        
+        // Clear existing markers
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                map.removeLayer(layer);
+            }
+        });
+        
+        // Add new markers for fishing locations
+        locationData.forEach(location => {
+            const marker = L.circleMarker([location.lat, location.lng], {
+                radius: Math.min(location.catch_amount / 10, 20),
+                fillColor: getColorByAmount(location.catch_amount),
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.7
+            }).addTo(map);
+            
+            marker.bindPopup(`
+                <strong>${location.species}</strong><br>
+                Catch: ${location.catch_amount} tons<br>
+                Area: ${location.fishing_area}<br>
+                Date: ${new Date(location.date).toLocaleDateString()}
+            `);
+        });
+    }
+
+    function getColorByAmount(amount) {
+        if (amount > 100) return '#d63384';
+        if (amount > 50) return '#fd7e14';
+        if (amount > 20) return '#ffc107';
+        return '#20c997';
+    }
+
+    function updateMapView(viewType) {
+        // This would switch between different map overlays
+        console.log('Switching to view:', viewType);
+        // Implementation would depend on specific requirements
+    }
+
+    function loadFishingPressureAnalysis() {
+        fetch('/api/fisheries-data')
+            .then(response => response.json())
+            .then(data => {
+                // This would typically come from a separate endpoint
+                // For demo, we'll create mock pressure analysis
+                updatePressureAnalysisTable();
+            })
+            .catch(error => console.error('Error loading pressure analysis:', error));
+    }
+
+    function updatePressureAnalysisTable() {
+        const tbody = document.getElementById('pressure-analysis-body');
+        
+        // Mock data for demonstration
+        const pressureData = [
+            {
+                area: 'North Atlantic',
+                events: 45,
+                totalCatch: 1250.5,
+                diversity: 8,
+                avgSustainability: 65.2,
+                pressureLevel: 'Medium'
+            },
+            {
+                area: 'Pacific Northwest',
+                events: 67,
+                totalCatch: 2100.3,
+                diversity: 12,
+                avgSustainability: 45.8,
+                pressureLevel: 'High'
+            },
+            {
+                area: 'Mediterranean',
+                events: 32,
+                totalCatch: 780.1,
+                diversity: 6,
+                avgSustainability: 72.4,
+                pressureLevel: 'Low'
+            }
+        ];
+        
+        tbody.innerHTML = pressureData.map(area => `
+            <tr>
+                <td>${area.area}</td>
+                <td>${area.events}</td>
+                <td>${area.totalCatch}</td>
+                <td>${area.diversity}</td>
+                <td>${area.avgSustainability}%</td>
+                <td>
+                    <span class="badge bg-${getPressureColor(area.pressureLevel)}">
+                        ${area.pressureLevel}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function getPressureColor(level) {
+        switch(level.toLowerCase()) {
+            case 'low': return 'success';
+            case 'medium': return 'warning';
+            case 'high': return 'danger';
+            case 'critical': return 'dark';
+            default: return 'secondary';
+        }
+    }
+
+    function loadOverfishingAlerts() {
+        fetch('/api/alerts')
+            .then(response => response.json())
+            .then(alerts => {
+                const overfishingAlerts = alerts.filter(alert => 
+                    alert.type === 'overfishing' || alert.type === 'sustainability_risk'
+                );
+                
+                document.getElementById('overfishing-alerts').textContent = overfishingAlerts.length;
+                
+                const container = document.getElementById('overfishing-alerts-container');
+                
+                if (overfishingAlerts.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">No active overfishing alerts</p>';
+                } else {
+                    container.innerHTML = overfishingAlerts.map(alert => `
+                        <div class="alert alert-${getSeverityColor(alert.severity)} alert-sm mb-2">
+                            <strong>${alert.title}</strong><br>
+                            <small>${alert.description}</small>
+                            ${alert.location ? `<br><small class="text-muted"><i class="fas fa-map-marker-alt"></i> ${alert.location}</small>` : ''}
+                        </div>
+                    `).join('');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading alerts:', error);
+                document.getElementById('overfishing-alerts-container').innerHTML = 
+                    '<p class="text-danger">Failed to load alerts</p>';
+            });
+    }
+
+    function getSeverityColor(severity) {
+        switch(severity) {
+            case 'critical': return 'danger';
+            case 'high': return 'warning';
+            case 'medium': return 'info';
+            case 'low': return 'secondary';
+            default: return 'secondary';
+        }
+    }
+
+    function showError(message) {
+        // Create and show error message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('main').insertBefore(alertDiv, document.querySelector('main').firstChild);
+    }
+</script>
+{% endblock %}

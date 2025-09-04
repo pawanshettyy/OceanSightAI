@@ -180,3 +180,44 @@ class SpeciesService:
         except Exception as e:
             self.logger.error(f"Error getting threatened species summary: {str(e)}")
             raise
+    
+    def find_or_create_species(self, species_data):
+        """Find existing species or create new one based on scientific name"""
+        try:
+            # Try to find existing species by scientific name
+            existing_species = Species.query.filter_by(
+                scientific_name=species_data['scientific_name']
+            ).first()
+            
+            if existing_species:
+                # Update existing species with new data if provided
+                existing_species.common_name = species_data.get('common_name', existing_species.common_name)
+                existing_species.species_type = species_data.get('species_type', existing_species.species_type)
+                existing_species.conservation_status = species_data.get('conservation_status', existing_species.conservation_status)
+                existing_species.threat_level = species_data.get('threat_level', existing_species.threat_level)
+                existing_species.habitat = species_data.get('habitat', existing_species.habitat)
+                existing_species.description = species_data.get('description', existing_species.description)
+                
+                db.session.commit()
+                return existing_species.id
+            else:
+                # Create new species
+                new_species = Species()
+                new_species.scientific_name = species_data['scientific_name']
+                new_species.common_name = species_data.get('common_name', '')
+                new_species.species_type = species_data.get('species_type', 'unknown')
+                new_species.conservation_status = species_data.get('conservation_status', 'unknown')
+                new_species.threat_level = species_data.get('threat_level', 'unknown')
+                new_species.habitat = species_data.get('habitat', '')
+                new_species.population_trend = 'unknown'
+                new_species.description = species_data.get('description', '')
+                
+                db.session.add(new_species)
+                db.session.commit()
+                
+                return new_species.id
+                
+        except Exception as e:
+            self.logger.error(f"Error finding or creating species: {str(e)}")
+            db.session.rollback()
+            raise

@@ -5,10 +5,13 @@ let speciesDatabase = [];
 let filteredSpecies = [];
 let speciesMap;
 let uploadedImageFile = null;
+let cameraStream = null;
+let captureMode = 'upload';
 
 // Initialize species page
 function initializeSpeciesPage() {
     setupImageUpload();
+    setupCameraControls();
     loadSpeciesDatabase();
     initializeSpeciesMap();
     setupEventListeners();
@@ -58,6 +61,210 @@ function setupImageUpload() {
     identifyBtn.addEventListener('click', performSpeciesIdentification);
 }
 
+function setupCameraControls() {
+    const uploadModeBtn = document.getElementById('upload-mode');
+    const cameraModeBtn = document.getElementById('camera-mode');
+    const uploadSection = document.getElementById('upload-section');
+    const cameraSection = document.getElementById('camera-section');
+    const startCameraBtn = document.getElementById('start-camera-btn');
+    const capturePhotoBtn = document.getElementById('capture-photo-btn');
+    const stopCameraBtn = document.getElementById('stop-camera-btn');
+    const retakeBtn = document.getElementById('retake-btn');
+    
+    if (!uploadModeBtn || !cameraModeBtn) return;
+    
+    // Mode toggle listeners
+    uploadModeBtn.addEventListener('change', () => {
+        if (uploadModeBtn.checked) {
+            captureMode = 'upload';
+            uploadSection.classList.remove('d-none');
+            cameraSection.classList.add('d-none');
+            stopCamera();
+        }
+    });
+    
+    cameraModeBtn.addEventListener('change', () => {
+        if (cameraModeBtn.checked) {
+            captureMode = 'camera';
+            uploadSection.classList.add('d-none');
+            cameraSection.classList.remove('d-none');
+        }
+    });
+    
+    // Camera control listeners
+    if (startCameraBtn) {
+        startCameraBtn.addEventListener('click', startCamera);
+    }
+    
+    if (capturePhotoBtn) {
+        capturePhotoBtn.addEventListener('click', capturePhoto);
+    }
+    
+    if (stopCameraBtn) {
+        stopCameraBtn.addEventListener('click', stopCamera);
+    }
+    
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', retakePhoto);
+    }
+}
+
+async function startCamera() {
+    try {
+        const video = document.getElementById('camera-video');
+        const startBtn = document.getElementById('start-camera-btn');
+        const captureBtn = document.getElementById('capture-photo-btn');
+        const stopBtn = document.getElementById('stop-camera-btn');
+        
+        if (!video) return;
+        
+        // Request camera access
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                facingMode: 'environment' // Use rear camera if available
+            },
+            audio: false
+        });
+        
+        video.srcObject = cameraStream;
+        video.play();
+        
+        // Update button states
+        startBtn.classList.add('d-none');
+        captureBtn.classList.remove('d-none');
+        stopBtn.classList.remove('d-none');
+        
+        // Hide any previous captured image
+        const imageContainer = document.getElementById('uploaded-image-container');
+        if (imageContainer) {
+            imageContainer.classList.add('d-none');
+        }
+        
+        // Reset identify button
+        const identifyBtn = document.getElementById('identify-btn');
+        if (identifyBtn) {
+            identifyBtn.disabled = true;
+            identifyBtn.innerHTML = '<i class="fas fa-search me-2"></i>Identify Species with AI';
+        }
+        
+    } catch (error) {
+        console.error('Error accessing camera:', error);
+        showError('Unable to access camera. Please check your camera permissions and try again.');
+    }
+}
+
+function capturePhoto() {
+    const video = document.getElementById('camera-video');
+    const canvas = document.getElementById('camera-canvas');
+    const imageContainer = document.getElementById('uploaded-image-container');
+    const image = document.getElementById('uploaded-image');
+    const identifyBtn = document.getElementById('identify-btn');
+    
+    if (!video || !canvas || !imageContainer || !image) return;
+    
+    const context = canvas.getContext('2d');
+    
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw the current video frame to canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convert canvas to blob
+    canvas.toBlob((blob) => {
+        uploadedImageFile = blob;
+        
+        // Display captured image
+        const imageUrl = URL.createObjectURL(blob);
+        image.src = imageUrl;
+        imageContainer.classList.remove('d-none');
+        
+        // Enable identify button
+        if (identifyBtn) {
+            identifyBtn.disabled = false;
+        }
+        
+        // Hide video feed
+        video.style.display = 'none';
+        
+        // Update button states
+        const captureBtn = document.getElementById('capture-photo-btn');
+        const stopBtn = document.getElementById('stop-camera-btn');
+        if (captureBtn) captureBtn.classList.add('d-none');
+        if (stopBtn) stopBtn.classList.add('d-none');
+        
+    }, 'image/jpeg', 0.8);
+}
+
+function retakePhoto() {
+    const video = document.getElementById('camera-video');
+    const imageContainer = document.getElementById('uploaded-image-container');
+    const identifyBtn = document.getElementById('identify-btn');
+    
+    // Hide captured image
+    if (imageContainer) {
+        imageContainer.classList.add('d-none');
+    }
+    
+    // Show video feed again
+    if (video) {
+        video.style.display = 'block';
+    }
+    
+    // Update button states
+    const captureBtn = document.getElementById('capture-photo-btn');
+    const stopBtn = document.getElementById('stop-camera-btn');
+    if (captureBtn) captureBtn.classList.remove('d-none');
+    if (stopBtn) stopBtn.classList.remove('d-none');
+    
+    // Disable identify button
+    if (identifyBtn) {
+        identifyBtn.disabled = true;
+    }
+    
+    uploadedImageFile = null;
+}
+
+function stopCamera() {
+    const video = document.getElementById('camera-video');
+    const startBtn = document.getElementById('start-camera-btn');
+    const captureBtn = document.getElementById('capture-photo-btn');
+    const stopBtn = document.getElementById('stop-camera-btn');
+    
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    
+    if (video) {
+        video.srcObject = null;
+        video.style.display = 'block';
+    }
+    
+    // Reset button states
+    if (startBtn) startBtn.classList.remove('d-none');
+    if (captureBtn) captureBtn.classList.add('d-none');
+    if (stopBtn) stopBtn.classList.add('d-none');
+    
+    // Hide captured image
+    const imageContainer = document.getElementById('uploaded-image-container');
+    if (imageContainer) {
+        imageContainer.classList.add('d-none');
+    }
+    
+    // Reset identify button
+    const identifyBtn = document.getElementById('identify-btn');
+    if (identifyBtn) {
+        identifyBtn.disabled = true;
+        identifyBtn.innerHTML = '<i class="fas fa-search me-2"></i>Identify Species with AI';
+    }
+    
+    uploadedImageFile = null;
+}
+
 function handleImageUpload(file) {
     if (!file.type.startsWith('image/')) {
         showError('Please upload a valid image file');
@@ -94,7 +301,7 @@ function handleImageUpload(file) {
 
 function performSpeciesIdentification() {
     if (!uploadedImageFile) {
-        showError('Please upload an image first');
+        showError('Please upload or capture an image first');
         return;
     }
     
@@ -106,28 +313,27 @@ function performSpeciesIdentification() {
     // Show loading state
     resultsContainer.innerHTML = `
         <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Analyzing image...</span>
+            <div class="loading-modern">
+                <div class="spinner-modern"></div>
+                <span>AI is analyzing the marine species...</span>
             </div>
-            <p class="mt-2">AI is analyzing the image...</p>
+            <p class="mt-2">This may take a few moments for accurate identification</p>
         </div>
     `;
     
     if (identifyBtn) {
         identifyBtn.disabled = true;
-        identifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+        identifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing with AI...';
     }
     
-    // Call identification API
+    // Prepare FormData to send image file
+    const formData = new FormData();
+    formData.append('file', uploadedImageFile);
+    
+    // Call identification API with real image data
     fetch('/api/species/identify', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            // In real implementation, would send image data
-            image_data: 'base64_encoded_image_data'
-        })
+        body: formData
     })
     .then(response => response.json())
     .then(result => {
@@ -136,16 +342,17 @@ function performSpeciesIdentification() {
     .catch(error => {
         console.error('Error identifying species:', error);
         resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
+            <div class="alert alert-modern alert-danger">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                Error occurred during species identification. Please try again.
+                <strong>Identification Failed</strong><br>
+                Error occurred during species identification. Please check your internet connection and try again.
             </div>
         `;
     })
     .finally(() => {
         if (identifyBtn) {
             identifyBtn.disabled = false;
-            identifyBtn.innerHTML = '<i class="fas fa-search me-2"></i>Identify Species';
+            identifyBtn.innerHTML = '<i class="fas fa-search me-2"></i>Identify Species with AI';
         }
     });
 }

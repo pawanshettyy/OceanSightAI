@@ -26,19 +26,62 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div id="image-upload-area" class="border-dashed p-4 text-center mb-3" style="border: 2px dashed #6c757d; border-radius: 0.375rem; min-height: 200px;">
-                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                        <p class="mb-2">Click to upload or drag and drop</p>
-                        <small class="text-muted">Supported formats: JPG, PNG, GIF (Max 10MB)</small>
-                        <input type="file" id="species-image" class="d-none" accept="image/*">
+                    <!-- Camera/Upload Toggle -->
+                    <div class="btn-group w-100 mb-3" role="group">
+                        <input type="radio" class="btn-check" name="capture-mode" id="upload-mode" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="upload-mode">
+                            <i class="fas fa-upload me-2"></i>Upload Image
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="capture-mode" id="camera-mode" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="camera-mode">
+                            <i class="fas fa-camera me-2"></i>Live Camera
+                        </label>
+                    </div>
+                    
+                    <!-- Upload Mode -->
+                    <div id="upload-section">
+                        <div id="image-upload-area" class="border-dashed p-4 text-center mb-3" style="border: 2px dashed #6c757d; border-radius: 0.375rem; min-height: 200px;">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <p class="mb-2">Click to upload or drag and drop</p>
+                            <small class="text-muted">Supported formats: JPG, PNG, GIF (Max 10MB)</small>
+                            <input type="file" id="species-image" class="d-none" accept="image/*">
+                        </div>
+                    </div>
+                    
+                    <!-- Camera Mode -->
+                    <div id="camera-section" class="d-none">
+                        <div class="text-center mb-3">
+                            <video id="camera-video" class="img-fluid rounded" style="max-width: 100%; height: 300px; background: #000;" autoplay playsinline></video>
+                            <canvas id="camera-canvas" class="d-none"></canvas>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center mb-3">
+                            <button id="start-camera-btn" class="btn btn-primary">
+                                <i class="fas fa-video me-2"></i>Start Camera
+                            </button>
+                            <button id="capture-photo-btn" class="btn btn-success d-none">
+                                <i class="fas fa-camera me-2"></i>Capture Photo
+                            </button>
+                            <button id="stop-camera-btn" class="btn btn-danger d-none">
+                                <i class="fas fa-stop me-2"></i>Stop Camera
+                            </button>
+                        </div>
+                        <div class="text-center">
+                            <small class="text-muted">Grant camera permission to capture marine species images in real-time</small>
+                        </div>
                     </div>
                     
                     <div id="uploaded-image-container" class="d-none mb-3">
-                        <img id="uploaded-image" src="" alt="Uploaded species image" class="img-fluid rounded">
+                        <img id="uploaded-image" src="" alt="Species image" class="img-fluid rounded">
+                        <div class="text-center mt-2">
+                            <button id="retake-btn" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-redo me-1"></i>Retake
+                            </button>
+                        </div>
                     </div>
                     
                     <button id="identify-btn" class="btn btn-success w-100" disabled>
-                        <i class="fas fa-search me-2"></i>Identify Species
+                        <i class="fas fa-search me-2"></i>Identify Species with AI
                     </button>
                 </div>
             </div>

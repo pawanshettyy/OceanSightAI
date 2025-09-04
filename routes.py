@@ -1,12 +1,15 @@
 from flask import render_template, request, jsonify, redirect, url_for, flash
 from app import app, db
-from models import OceanData, Species, FisheriesData, BiodiversityIndex, Alert, SpeciesObservation
+from app import OceanData, Species, FisheriesData, BiodiversityIndex, Alert, SpeciesObservation, db
 from services.ocean_service import OceanService
 from services.species_service import SpeciesService
 from services.fisheries_service import FisheriesService
 from services.biodiversity_service import BiodiversityService
+from services.openai_service import OpenAISpeciesIdentificationService
 from datetime import datetime, timedelta
 import json
+import base64
+import os
 
 @app.route('/')
 def index():
@@ -102,16 +105,60 @@ def get_biodiversity_index():
 
 @app.route('/api/species/identify', methods=['POST'])
 def identify_species():
-    """Mock species identification endpoint"""
+    """Real species identification using OpenAI Vision API"""
     try:
-        species_service = SpeciesService()
+        # Check if OpenAI API key is available
+        if not os.environ.get("OPENAI_API_KEY"):
+            # Fall back to mock identification if no API key
+            species_service = SpeciesService()
+            result = species_service.mock_species_identification()
+            result['note'] = 'Using mock identification - OpenAI API key not configured'
+            return jsonify(result)
         
-        # In a real implementation, this would process an uploaded image
-        # For now, we'll return a mock identification result
-        result = species_service.mock_species_identification()
+        # Get image data from request
+        if 'file' in request.files:
+            # File upload
+            file = request.files['file']
+            if file.filename == '':
+                return jsonify({'error': 'No file selected'}), 400
+            
+            image_data = file.read()
+        elif request.json and 'image_data' in request.json:
+            # Base64 encoded image data
+            image_data = request.json['image_data']
+        else:
+            return jsonify({'error': 'No image data provided'}), 400
+        
+        # Get location context if provided
+        location = request.json.get('location', 'Indian Ocean') if request.json else 'Indian Ocean'
+        
+        # Initialize OpenAI service and identify species
+        openai_service = OpenAISpeciesIdentificationService()
+        result = openai_service.identify_marine_species(image_data, location)
+        
+        # If successfully identified, try to find or create species in database
+        if result.get('identified') and result.get('scientific_name'):
+            species_service = SpeciesService()
+            species_id = species_service.find_or_create_species({
+                'scientific_name': result['scientific_name'],
+                'common_name': result['common_name'],
+                'species_type': result.get('species_type', 'unknown'),
+                'conservation_status': result.get('conservation_status', 'unknown'),
+                'threat_level': result.get('threat_level', 'unknown'),
+                'habitat': result.get('habitat', ''),
+                'description': result.get('description', '')
+            })
+            result['species_id'] = species_id
+        
         return jsonify(result)
+        
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Species identification error: {str(e)}")
+        return jsonify({
+            'identified': False,
+            'error': f'Error during species identification: {str(e)}',
+            'confidence': 0
+        }), 500
 
 @app.route('/api/alerts')
 def get_alerts():

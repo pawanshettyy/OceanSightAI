@@ -293,3 +293,288 @@
         rgba(255, 107, 53, 0.8) 100%
     );
 }
+
+/* Modern UI Enhancements */
+.glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.gradient-border {
+    background: linear-gradient(45deg, var(--ocean-blue), var(--wave-cyan));
+    padding: 2px;
+    border-radius: var(--bs-border-radius);
+}
+
+.gradient-border-inner {
+    background: var(--bs-body-bg);
+    border-radius: calc(var(--bs-border-radius) - 2px);
+}
+
+/* Enhanced camera interface */
+.camera-container {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    border: 2px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.camera-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 33.333% 33.333%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Modern button styles */
+.btn-modern {
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.btn-gradient-primary {
+    background: linear-gradient(135deg, var(--ocean-blue), var(--wave-cyan));
+    border: none;
+    color: white;
+}
+
+.btn-gradient-success {
+    background: linear-gradient(135deg, var(--marine-green), #4CAF50);
+    border: none;
+    color: white;
+}
+
+.btn-gradient-warning {
+    background: linear-gradient(135deg, var(--coral-orange), #FF8A80);
+    border: none;
+    color: white;
+}
+
+/* Enhanced cards */
+.card-modern {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header-modern {
+    background: linear-gradient(135deg, var(--ocean-blue), var(--deep-blue));
+    color: white;
+    border: none;
+    padding: 1.5rem;
+}
+
+/* Progress indicators */
+.progress-modern {
+    height: 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.progress-bar-animated {
+    background: linear-gradient(90deg, var(--wave-cyan), var(--ocean-blue));
+    animation: progress-shimmer 2s infinite;
+}
+
+@keyframes progress-shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+/* Species identification enhancement */
+.species-result-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.species-result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ocean-blue), var(--wave-cyan), var(--marine-green));
+}
+
+/* Enhanced alerts */
+.alert-modern {
+    border: none;
+    border-radius: 15px;
+    padding: 1.5rem;
+    border-left: 5px solid;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-modern.alert-success {
+    border-left-color: var(--marine-green);
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(45, 90, 39, 0.05));
+}
+
+.alert-modern.alert-warning {
+    border-left-color: var(--coral-orange);
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 138, 128, 0.05));
+}
+
+.alert-modern.alert-danger {
+    border-left-color: #dc3545;
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(248, 215, 218, 0.05));
+}
+
+/* Navigation enhancement */
+.navbar-modern {
+    backdrop-filter: blur(10px);
+    background: rgba(13, 27, 42, 0.9) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link-modern {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.nav-link-modern::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--wave-cyan);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link-modern:hover::after,
+.nav-link-modern.active::after {
+    width: 80%;
+}
+
+/* Map enhancements */
+.map-modern {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.map-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 0%, rgba(0, 119, 190, 0.1) 50%, transparent 100%);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Loading states enhancement */
+.loading-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.spinner-modern {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid var(--wave-cyan);
+    border-radius: 50%;
+    animation: spin-modern 1s linear infinite;
+}
+
+@keyframes spin-modern {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Floating action button */
+.fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ocean-blue), var(--wave-cyan));
+    color: white;
+    border: none;
+    box-shadow: 0 6px 20px rgba(0, 119, 190, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 119, 190, 0.4);
+}
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+    .card-modern {
+        margin-bottom: 1rem;
+    }
+    
+    .species-result-card {
+        padding: 1rem;
+    }
+    
+    .fab {
+        bottom: 1rem;
+        right: 1rem;
+        width: 48px;
+        height: 48px;
+    }
+}
